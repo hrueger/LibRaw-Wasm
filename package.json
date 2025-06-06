@@ -8,7 +8,7 @@
 		"lib": "lib"
 	},
 	"scripts": {
-		"example": "python -m http.server 9000",
+		"example": "node simple-server.js && open http://localhost:9001/example/example.html",
 		"build": "node build.js"
 	},
 	"files": [
