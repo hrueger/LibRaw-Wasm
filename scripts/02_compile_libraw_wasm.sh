@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 set -e
-
+cd ..
 #---------------------------------------------------------------------------------
 # Build the final WASM from libraw_wrapper.cpp
 #---------------------------------------------------------------------------------
@@ -21,15 +21,15 @@ emcc \
   -s ENVIRONMENT="web,worker" \
   -msimd128 \
   -O3 -flto -pthread \
-  libraw_wrapper.cpp \
+  src/libraw_wrapper.cpp \
   libraries/lcms2/src/.libs/liblcms2.a \
   libraries/LibRawSource/lib/.libs/libraw.a \
-  -o libraw.js
+  -o src/libraw.js
 
 
 echo -e "\n==> Building Dist files..."
 
-node build.js
+node scripts/build.js
 
 
 echo ""

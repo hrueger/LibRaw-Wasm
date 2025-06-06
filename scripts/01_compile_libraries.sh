@@ -6,7 +6,7 @@ set -e
 # 0) Configure and Build LCMS with Emscripten
 #---------------------------------------------------------------------------------
 echo -e "\n==> Compiling LCMS..."
-cd libraries/lcms2
+cd ../libraries/lcms2
 glibtoolize
 autoreconf -fi
 # 2) Configure and make with Emscripten

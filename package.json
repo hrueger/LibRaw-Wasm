@@ -8,8 +8,10 @@
 		"lib": "lib"
 	},
 	"scripts": {
-		"example": "node simple-server.js && open http://localhost:9001/example/example.html",
-		"build": "node build.js"
+		"example": "node ./scripts/example-server.js & sleep 1 && open http://localhost:9001/example/",
+		"build:all": "cd ./scripts && ./00_compile_all.sh",
+		"build:libraries": "cd ./scripts && ./01_compile_libraries.sh",
+		"build:wasm": "cd ./scripts && ./02_compile_libraw_wasm.sh"
 	},
 	"files": [
 		"dist/*"
