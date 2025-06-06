@@ -959,6 +959,52 @@ public:
 		return resultObj;
 	}
 
+	val rawImageData() {
+		if (!processor_) {
+			return val::undefined();
+		}
+
+		// Unpack if not already done
+		if (!isUnpacked) {
+			isUnpacked = true;
+			int ret = processor_->unpack();
+			if (ret != LIBRAW_SUCCESS) {
+				throw std::runtime_error("LibRaw: unpack() failed with code " + std::to_string(ret));
+			}
+		}
+
+		auto &raw = processor_->imgdata.rawdata;
+		auto &sizes = processor_->imgdata.sizes;
+
+		// Only support raw_image (ushort*)
+		if (!raw.raw_image) {
+			return val::undefined();
+		}
+
+		val resultObj = val::object();
+		resultObj.set("raw_height", sizes.raw_height);
+		resultObj.set("raw_width", sizes.raw_width);
+		resultObj.set("top_margin", sizes.top_margin);
+		resultObj.set("left_margin", sizes.left_margin);
+		resultObj.set("height", sizes.height);
+		resultObj.set("width", sizes.width);
+		// 'colors' and 'bits' are not available in sizes/idata for raw, so omit them
+
+		size_t pixelCount = static_cast<size_t>(sizes.raw_height) * static_cast<size_t>(sizes.raw_width);
+
+		val jsData = val::undefined();
+
+		// raw_image is ushort* (16 bits per sample)
+		val typedArrayCtor = val::global("Uint16Array");
+		val typedArray = typedArrayCtor.new_(val((unsigned)pixelCount));
+		val memView = val(typed_memory_view(pixelCount, raw.raw_image));
+		typedArray.call<void>("set", memView);
+		jsData = typedArray;
+
+		resultObj.set("data", jsData);
+		return resultObj;
+	}
+
 private:
 	LibRaw* processor_ = nullptr;
 	bool isUnpacked = false;
@@ -1186,5 +1232,6 @@ EMSCRIPTEN_BINDINGS(libraw_module) {
 		.constructor<>()
 		.function("open", &WASMLibRaw::open)
 		.function("metadata", &WASMLibRaw::metadata)
-		.function("imageData", &WASMLibRaw::imageData);
+		.function("imageData", &WASMLibRaw::imageData)
+		.function("rawImageData", &WASMLibRaw::rawImageData);
 }
