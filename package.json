@@ -3,9 +3,11 @@
 	"version": "1.1.2",
 	"description": "LibRaw WASM bindings to be able to use it in the browser.",
 	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
 	"type": "module",
 	"directories": {
-		"lib": "lib"
+		"lib": "src",
+		"example": "scripts/example-server.js"
 	},
 	"scripts": {
 		"example": "node ./scripts/example-server.js & sleep 1 && open http://localhost:9001/example/",
@@ -19,6 +21,9 @@
 	"author": "ybouane",
 	"license": "ISC",
 	"devDependencies": {
-		"esbuild": "^0.24.2"
-	}
+		"@types/node": "^22.15.30",
+		"esbuild": "^0.24.2",
+		"typescript": "^5.8.3"
+	},
+	"packageManager": "yarn@4.9.2"
 }
