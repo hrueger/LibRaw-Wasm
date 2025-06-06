@@ -1,0 +1,6 @@
+[submodule "libraries/lcms2"]
+	path = libraries/lcms2
+	url = https://github.com/mm2/Little-CMS.git
+[submodule "libraries/LibRawSource"]
+	path = libraries/LibRawSource
+	url = https://github.com/LibRaw/LibRaw.git

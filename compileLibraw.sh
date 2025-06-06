@@ -2,37 +2,28 @@
 
 set -e
 
-rm -rf libs includes LibRawSource lcms2 2>/dev/null || true
-mkdir libs
-mkdir includes
-
 
 #---------------------------------------------------------------------------------
 # 0) Configure and Build LCMS with Emscripten
 #---------------------------------------------------------------------------------
-echo -e "\n==> Cloning LCMS from GitHub..."
-git clone https://github.com/mm2/Little-CMS.git lcms2
-cd lcms2
+echo -e "\n==> Compiling LCMS..."
+cd libraries/lcms2
 glibtoolize
 autoreconf -fi
 # 2) Configure and make with Emscripten
 emconfigure ./configure --host=wasm32-unknown-emscripten \
   --disable-shared
 emmake make -j8
-
-cp -R src/.libs/* ../libs/
-cp -R include/* ../includes/
-cd ..
+cd ../..
 
 
 
 #---------------------------------------------------------------------------------
 # 1) Download & Prepare LibRaw
 #---------------------------------------------------------------------------------
-echo -e "\n==> Cloning LibRaw from GitHub..."
-git clone https://github.com/LibRaw/LibRaw.git LibRawSource
+echo -e "\n==> Compiling LibRaw..."
 
-pushd LibRawSource
+pushd libraries/LibRawSource
 
 echo -e "\n==> Generating configure script from configure.ac..."
 # Generate ./configure from configure.ac
@@ -49,16 +40,13 @@ emconfigure ./configure \
   --enable-lcms \
   --disable-shared \
   --disable-examples \
-  CFLAGS="-O3 -flto -ffast-math -msimd128 -DNDEBUG -DUSE_LCMS2 -I../includes" \
-  CXXFLAGS="-O3 -flto -ffast-math -msimd128 -DNDEBUG -DUSE_LCMS2 -I../includes" \
-  LDFLAGS="-s USE_PTHREADS=1 -lpthread -L../libs/ -llcms2"
+  CFLAGS="-O3 -flto -ffast-math -msimd128 -DNDEBUG -DUSE_LCMS2 -I../lcms2/include" \
+  CXXFLAGS="-O3 -flto -ffast-math -msimd128 -DNDEBUG -DUSE_LCMS2 -I../lcms2/include" \
+  LDFLAGS="-s USE_PTHREADS=1 -lpthread ../lcms2/src/.libs/liblcms2.a"
 
 echo -e "\n==> Building LibRaw..."
 emmake make -j8
 
-# Copy artifacts out of the source folder for convenience
-cp -R lib/.libs/* ../libs/
-cp -R libraw ../includes/
 popd  # out of LibRawSource
 
 #---------------------------------------------------------------------------------
@@ -67,7 +55,7 @@ popd  # out of LibRawSource
 echo -e "\n==> Building libraw.js + libraw.wasm..."
 emcc \
   --bind \
-  -I./includes \
+  -I./libraries/LibRawSource \
   -s USE_LIBPNG=1 \
   -s USE_LIBJPEG=1 \
   -s USE_ZLIB=1 \
@@ -81,8 +69,8 @@ emcc \
   -msimd128 \
   -O3 -flto -pthread \
   libraw_wrapper.cpp \
-  ./libs/liblcms2.a \
-  ./libs/libraw.a \
+  libraries/lcms2/src/.libs/liblcms2.a \
+  libraries/LibRawSource/lib/.libs/libraw.a \
   -o libraw.js
 
 
