@@ -1,8 +1,6 @@
 // Type definitions for LibRaw WebAssembly wrapper
 // These types are inferred from typical LibRaw C++ API usage
 
-export type LibRawSettings = Record<string, unknown>;
-
 export interface Metadata {
     thumb_format?: number | string;
     desc?: string;
@@ -463,11 +461,11 @@ export interface LibRawFullMetadata extends LibRawBasicMetadata {
 
 // --- Settings ---
 export interface LibRawSettings {
-    greybox?: number[];
-    cropbox?: number[];
-    aber?: number[];
-    gamm?: number[];
-    userMul?: number[];
+    greybox?: [number, number, number, number];
+    cropbox?: [number, number, number, number];
+    aber?: [number, number, number, number];
+    gamm?: [number, number, number, number, number, number];
+    userMul?: [number, number, number, number];
     bright?: number;
     threshold?: number;
     autoBrightThr?: number;
@@ -487,7 +485,7 @@ export interface LibRawSettings {
     userFlip?: number;
     userQual?: number;
     userBlack?: number;
-    userCblack?: number[];
+    userCblack?: [number, number, number, number];
     userSat?: number;
     medPasses?: number;
     noAutoBright?: number;
